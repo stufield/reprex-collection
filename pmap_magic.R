@@ -1,5 +1,5 @@
-
 #' Let's just admit it, `purrr::pmap` is awesome!
+#' -------------------------
 library(purrr)
 library(tibble)
 set.seed(101)

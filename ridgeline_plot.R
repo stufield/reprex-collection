@@ -16,7 +16,6 @@ seq(50, 5, by = -5) %>%
   gather(key = "Group", value = "value") %>%
   ggplot(aes(x = value, y = Group)) +
     geom_density_ridges(scale = 3, fill = "blue", alpha = 0.5) +
-    #scale_x_log10() +
     ggtitle("Cool Density Ridges") +
     theme_ridges() +
     NULL

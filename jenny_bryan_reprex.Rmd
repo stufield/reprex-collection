@@ -1,0 +1,142 @@
+---
+title: "Jenny Bryan Webinar on `reprex`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r echo = FALSE}
+library(reprex)
+```
+
+# Resources
+* [https://reprex.tidyverse.org/articles/reprex-dos-and-donts.html](reprex dos and donts)
+* [https://github.com/tidyverse/reprex](reprex github)
+* [rstd.io/reprex](info materials)
+* Current `reprex` v`r packageVersion('reprex')`
+  
+
+# How to generate a `reprex`
+1. from clipboard -> `reprex::reprex()`
+2. use addin -> RRStudio
+   i) launch GUI
+   i) selection -> key binding (Crtl+Shift+R)
+3. use an inline expression
+4. use a separate file
+5. NOTE: reprex -> highlight -> copy -> paste -> rmarkdown
+
+
+# How to make a good `reprex`
+The `reprex` philosophy:
+
+* code that runs                       -> it must be self contained
+* code that reader doesn't have to run -> keep it simple
+* code that reader could easily run    -> NEVER SCREEN SHOT!!!!
+
+
+
+## Example:
+```{r}
+x <- factor("a")
+y <- factor("b")
+c(x, y)
+```
+
+
+
+## Simplist possible example
+```{r}
+read.csv(text = "a,b\n1,2\n3,4")  # inline creation of df
+```
+
+
+
+
+
+
+## You can include plots as well!
+```{r, eval = FALSE}
+reprex({
+  library(magrittr)
+  library(ggplot2)
+  set.seed(101)
+  data.frame(x = 1:100,
+             y = 1:100 + rnorm(100, sd = 10)) %>% 
+    ggplot2::ggplot(ggplot2::aes(x = x, y = y)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_smooth(method = "loess") +
+    NULL
+})
+```
+
+
+```{r, eval = FALSE}
+# copy all code
+# removes `#` at lines
+reprex::reprex::clean()
+```
+
+
+# Output options
+```{r, eval = FALSE}
+reprex({
+  x <- rnorm(100)
+  y <- rnorm(100)
+  stats::cor(x, y)
+})
+```
+
+
+## You can send output files to directory
+```{r, eval = FALSE}
+reprex({
+  x <- rnorm(100)
+  y <- rnorm(100)
+  stats::cor(x, y)
+}, outfile = "my_corr")
+```
+
+
+## Include session info
+```{r, eval = FALSE}
+reprex({
+  x <- rnorm(100)
+  y <- rnorm(100)
+  stats::cor(x, y)
+}, si = TRUE)    # session info
+```
+
+
+## Re-style your code
+```{r, eval = FALSE}
+reprex({
+  x <- rnorm(100)
+  y <- rnorm(100)
+  stats::cor(x, y)
+}, style = TRUE)    # tidyverse style
+```
+
+
+
+## capture standard error out
+```{r eval = FALSE}
+reprex({
+  x <- rnorm(100)
+  y <- rnorm(100)
+  stats::cor(x, y)
+}, std_out_err = TRUE)
+```
+
+
+
+
+# Jen’s Yellowstone Bison Say
+```{r, echo = FALSE}
+cowsay::say(what = "Hello Jen! Thanks for preserving my genetics!",
+            by = "buffalo")
+```
+

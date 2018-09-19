@@ -308,97 +308,32 @@ $(document).ready(function () {
 </div>
 
 
-<div id="use-expand.grid-or-purrrcross_df-instead-of-nesting-purrrmap" class="section level2">
-<h2>Use <code>expand.grid</code> or <code>purrr::cross_df</code> instead of nesting <code>purrr::map</code></h2>
-<ul>
-<li>As Hadley points out on Twitter, it’s better to set up your combinations up front</li>
-<li>Then use <code>purrr::map2</code> or <code>purrr::pmap</code> to iterate over the rows</li>
-<li>Nesting <code>purrr::map</code> calls should be avoided if possible</li>
-</ul>
-<!-- end list -->
-<pre class="r"><code>library(purrr)</code></pre>
-<p>In case you haven’t learned about <code>purrr::cross</code> (and it’s variants). It’s simply the <code>purrr</code> version of <code>expand.grid</code>:</p>
-<pre class="r"><code>expand.grid(mean = 1:3, sd = 1:3)
-#&gt;   mean sd
-#&gt; 1    1  1
-#&gt; 2    2  1
-#&gt; 3    3  1
-#&gt; 4    1  2
-#&gt; 5    2  2
-#&gt; 6    3  2
-#&gt; 7    1  3
-#&gt; 8    2  3
-#&gt; 9    3  3
-cross_df(list(mean = 1:3, sd = 1:3))
-#&gt; # A tibble: 9 x 2
-#&gt;    mean    sd
-#&gt;   &lt;int&gt; &lt;int&gt;
-#&gt; 1     1     1
-#&gt; 2     2     1
-#&gt; 3     3     1
-#&gt; 4     1     2
-#&gt; 5     2     2
-#&gt; 6     3     2
-#&gt; 7     1     3
-#&gt; 8     2     3
-#&gt; 9     3     3</code></pre>
-<p>Now we are in a perfect situation to use <code>purrr::pmap</code> to loop over rows with named arguments</p>
-<pre class="r"><code>cross_df(list(mean = 1:3, sd = 1:3)) %&gt;%   # all combos
-  pmap_dbl(dnorm, x = 0.5)                 # pmap magic!
-#&gt; [1] 0.35206533 0.12951760 0.01752830 0.19333406 0.15056872 0.09132454
-#&gt; [7] 0.13114657 0.11735511 0.09397063</code></pre>
-<p>So you can see what just happened, the <code>dnorm</code> call explicitly:</p>
-<pre class="r"><code>dnorm(0.5, mean = 1, sd = 1)
-#&gt; [1] 0.3520653
-dnorm(0.5, mean = 2, sd = 1)
-#&gt; [1] 0.1295176</code></pre>
-<p>The final fantastic piece is that unwanted combinations can be filtered out using an optional <code>predicate</code> function</p>
-<pre class="r"><code>cross_df(list(mean = 1:3, sd = 1:3), .filter = `==`)    # all combos except equal
-#&gt; # A tibble: 6 x 2
-#&gt;    mean    sd
-#&gt;   &lt;int&gt; &lt;int&gt;
-#&gt; 1     2     1
-#&gt; 2     3     1
-#&gt; 3     1     2
-#&gt; 4     3     2
-#&gt; 5     1     3
-#&gt; 6     2     3
+<div id="purrrmodify_if-does-not-maintain-class-as-promised-for-atomic-vectors" class="section level2">
+<h2><code>purrr::modify_if</code> does not maintain class as promised for atomic vectors</h2>
+<pre class="r"><code># purrr
+packageVersion(&quot;purrr&quot;)
+#&gt; [1] '0.2.5'
 
-# custom predicate
-filter &lt;- function(x, y) x &gt; y
-cross_df(list(mean = 1:3, sd = 1:3), .filter = filter)  # all combos except x &gt; y
-#&gt; # A tibble: 6 x 2
-#&gt;    mean    sd
-#&gt;   &lt;int&gt; &lt;int&gt;
-#&gt; 1     1     1
-#&gt; 2     1     2
-#&gt; 3     2     2
-#&gt; 4     1     3
-#&gt; 5     2     3
-#&gt; 6     3     3</code></pre>
-<p>An alternative syntax:</p>
-<pre class="r"><code>seq_len(3) %&gt;%
-  list(mean = ., sd = .) %&gt;%
-  cross_df(.filter = `==`)
-#&gt; # A tibble: 6 x 2
-#&gt;    mean    sd
-#&gt;   &lt;int&gt; &lt;int&gt;
-#&gt; 1     2     1
-#&gt; 2     3     1
-#&gt; 3     1     2
-#&gt; 4     3     2
-#&gt; 5     1     3
-#&gt; 6     2     3</code></pre>
-<p>An example from SomaR::FeatureSeln</p>
-<pre class="r"><code>list(fold = paste0(&quot;Fold&quot;, seq(5)),
-     run  = paste0(&quot;Run&quot;, seq(4))) %&gt;%
-  purrr::cross_df() %&gt;%
-  purrr::pmap_chr(paste, sep = &quot;_&quot;)
-#&gt;  [1] &quot;Fold1_Run1&quot; &quot;Fold2_Run1&quot; &quot;Fold3_Run1&quot; &quot;Fold4_Run1&quot; &quot;Fold5_Run1&quot;
-#&gt;  [6] &quot;Fold1_Run2&quot; &quot;Fold2_Run2&quot; &quot;Fold3_Run2&quot; &quot;Fold4_Run2&quot; &quot;Fold5_Run2&quot;
-#&gt; [11] &quot;Fold1_Run3&quot; &quot;Fold2_Run3&quot; &quot;Fold3_Run3&quot; &quot;Fold4_Run3&quot; &quot;Fold5_Run3&quot;
-#&gt; [16] &quot;Fold1_Run4&quot; &quot;Fold2_Run4&quot; &quot;Fold3_Run4&quot; &quot;Fold4_Run4&quot; &quot;Fold5_Run4&quot;</code></pre>
-<p>Created on 2018-09-05 by the <a href="https://reprex.tidyverse.org">reprex package</a> (v0.2.0.9000).</p>
+# numeric
+set.seed(101)
+v &lt;- runif(10)
+class(v)
+#&gt; [1] &quot;numeric&quot;
+all.equal(v, purrr::modify_if(v, ~ . &lt; 0.5, ~ . + 5))
+#&gt; [1] &quot;Modes: numeric, list&quot;              
+#&gt; [2] &quot;target is numeric, current is list&quot;
+
+# integer
+nas &lt;- c(5L, 6L, NA, 7L)
+all.equal(nas, purrr::modify_if(nas, is.na, ~0L))
+#&gt; [1] &quot;Modes: numeric, list&quot;              
+#&gt; [2] &quot;target is numeric, current is list&quot;
+
+# character
+all.equal(letters[1:5], purrr::modify_if(letters[1:5], ~.==&quot;c&quot;, ~&quot;C&quot;))
+#&gt; [1] &quot;Modes: character, list&quot;              
+#&gt; [2] &quot;target is character, current is list&quot;</code></pre>
+<p>Created on 2018-09-12 by the <a href="https://reprex.tidyverse.org">reprex package</a> (v0.2.0.9000).</p>
 <details>
 <p><summary>Session info</summary></p>
 <pre class="r"><code>devtools::session_info()
@@ -410,42 +345,36 @@ cross_df(list(mean = 1:3, sd = 1:3), .filter = filter)  # all combos except x &g
 #&gt;  language en_US                       
 #&gt;  collate  en_US.UTF-8                 
 #&gt;  tz       America/Denver              
-#&gt;  date     2018-09-05
+#&gt;  date     2018-09-12
 #&gt; Packages -----------------------------------------------------------------
-#&gt;  package    * version date       source                      
-#&gt;  assertthat   0.2.0   2017-04-11 CRAN (R 3.5.1)              
-#&gt;  backports    1.1.2   2017-12-13 CRAN (R 3.5.1)              
-#&gt;  base       * 3.5.1   2018-07-03 local                       
-#&gt;  cli          1.0.0   2017-11-05 CRAN (R 3.5.1)              
-#&gt;  compiler     3.5.1   2018-07-03 local                       
-#&gt;  crayon       1.3.4   2017-09-16 CRAN (R 3.5.1)              
-#&gt;  datasets   * 3.5.1   2018-07-03 local                       
-#&gt;  devtools     1.13.6  2018-06-27 CRAN (R 3.5.1)              
-#&gt;  digest       0.6.15  2018-01-28 CRAN (R 3.5.1)              
-#&gt;  evaluate     0.11    2018-07-17 cran (@0.11)                
-#&gt;  graphics   * 3.5.1   2018-07-03 local                       
-#&gt;  grDevices  * 3.5.1   2018-07-03 local                       
-#&gt;  htmltools    0.3.6   2017-04-28 CRAN (R 3.5.1)              
-#&gt;  knitr        1.20.15 2018-08-28 Github (yihui/knitr@4cf7a6f)
-#&gt;  magrittr     1.5     2014-11-22 CRAN (R 3.5.1)              
-#&gt;  memoise      1.1.0   2017-04-21 CRAN (R 3.5.1)              
-#&gt;  methods    * 3.5.1   2018-07-03 local                       
-#&gt;  pillar       1.2.3   2018-05-25 CRAN (R 3.5.1)              
-#&gt;  purrr      * 0.2.5   2018-05-29 CRAN (R 3.5.1)              
-#&gt;  Rcpp         0.12.18 2018-07-23 cran (@0.12.18)             
-#&gt;  rlang        0.2.2   2018-08-16 cran (@0.2.2)               
-#&gt;  rmarkdown    1.10    2018-06-11 CRAN (R 3.5.1)              
-#&gt;  rprojroot    1.3-2   2018-01-03 CRAN (R 3.5.1)              
-#&gt;  stats      * 3.5.1   2018-07-03 local                       
-#&gt;  stringi      1.2.3   2018-06-12 CRAN (R 3.5.1)              
-#&gt;  stringr      1.3.1   2018-05-10 CRAN (R 3.5.1)              
-#&gt;  tibble       1.4.2   2018-01-22 CRAN (R 3.5.1)              
-#&gt;  tools        3.5.1   2018-07-03 local                       
-#&gt;  utf8         1.1.4   2018-05-24 CRAN (R 3.5.1)              
-#&gt;  utils      * 3.5.1   2018-07-03 local                       
-#&gt;  withr        2.1.2   2018-03-15 CRAN (R 3.5.1)              
-#&gt;  xfun         0.3     2018-07-06 CRAN (R 3.5.1)              
-#&gt;  yaml         2.2.0   2018-07-25 cran (@2.2.0)</code></pre>
+#&gt;  package   * version date       source                      
+#&gt;  backports   1.1.2   2017-12-13 CRAN (R 3.5.1)              
+#&gt;  base      * 3.5.1   2018-07-03 local                       
+#&gt;  compiler    3.5.1   2018-07-03 local                       
+#&gt;  datasets  * 3.5.1   2018-07-03 local                       
+#&gt;  devtools    1.13.6  2018-06-27 CRAN (R 3.5.1)              
+#&gt;  digest      0.6.15  2018-01-28 CRAN (R 3.5.1)              
+#&gt;  evaluate    0.11    2018-07-17 cran (@0.11)                
+#&gt;  graphics  * 3.5.1   2018-07-03 local                       
+#&gt;  grDevices * 3.5.1   2018-07-03 local                       
+#&gt;  htmltools   0.3.6   2017-04-28 CRAN (R 3.5.1)              
+#&gt;  knitr       1.20.15 2018-08-28 Github (yihui/knitr@4cf7a6f)
+#&gt;  magrittr    1.5     2014-11-22 CRAN (R 3.5.1)              
+#&gt;  memoise     1.1.0   2017-04-21 CRAN (R 3.5.1)              
+#&gt;  methods   * 3.5.1   2018-07-03 local                       
+#&gt;  purrr       0.2.5   2018-05-29 CRAN (R 3.5.1)              
+#&gt;  Rcpp        0.12.18 2018-07-23 cran (@0.12.18)             
+#&gt;  rlang       0.2.2   2018-08-16 cran (@0.2.2)               
+#&gt;  rmarkdown   1.10    2018-06-11 CRAN (R 3.5.1)              
+#&gt;  rprojroot   1.3-2   2018-01-03 CRAN (R 3.5.1)              
+#&gt;  stats     * 3.5.1   2018-07-03 local                       
+#&gt;  stringi     1.2.3   2018-06-12 CRAN (R 3.5.1)              
+#&gt;  stringr     1.3.1   2018-05-10 CRAN (R 3.5.1)              
+#&gt;  tools       3.5.1   2018-07-03 local                       
+#&gt;  utils     * 3.5.1   2018-07-03 local                       
+#&gt;  withr       2.1.2   2018-03-15 CRAN (R 3.5.1)              
+#&gt;  xfun        0.3     2018-07-06 CRAN (R 3.5.1)              
+#&gt;  yaml        2.2.0   2018-07-25 cran (@2.2.0)</code></pre>
 </details>
 </div>
 

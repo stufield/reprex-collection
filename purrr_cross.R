@@ -1,7 +1,9 @@
 #' Use `expand.grid` or `purrr::cross_df` instead of nesting `purrr::map`
 #' ---------------------
 #'   * As Hadley points out on Twitter, it's better to set up
-#'   your combinations up front and use `purrr::map2` than to nest `purrr::map` calls
+#'   your combinations up front
+#'   * Then use `purrr::map2` or `purrr::pmap` to iterate over the rows
+#'   * Nesting `purrr::map` calls should be avoided if possible
 # ------------------
 library(purrr)
 
@@ -30,7 +32,13 @@ cross_df(list(mean = 1:3, sd = 1:3), .filter = `==`)    # all combos except equa
 filter <- function(x, y) x > y
 cross_df(list(mean = 1:3, sd = 1:3), .filter = filter)  # all combos except x > y
 
-#' Lastly, an alternative syntax:
+#' An alternative syntax:
 seq_len(3) %>%
   list(mean = ., sd = .) %>%
   cross_df(.filter = `==`)
+
+#' An example from SomaR::FeatureSeln
+list(fold = paste0("Fold", seq(5)),
+     run  = paste0("Run", seq(4))) %>%
+  purrr::cross_df() %>%
+  purrr::pmap_chr(paste, sep = "_")

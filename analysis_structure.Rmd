@@ -1,0 +1,49 @@
+A proposed analysis directory structure for SomaLogic Analyses
+---------------------
+
+This proposed structure is a mixture of suggested directory structures
+seen in various `RStudio` and `#rstats` user groups.
+It can also be used to ensure Jenny Bryan will not burn down your machine.
+
+Key Points:
+
+* Reproducibility
+  + use RStudio
+  + use `.Rproj`
+  + use relative paths
+  + use `here::here()`
+* Recognition
+* Simplicity
+
+```
+|--bi_analysis.Rproj            # RStudio file marks project root
+|--R/
+    |--env.R                    # everything necessary to recreate analysis environment
+    |--lib.R                    # calls `env.R`; analysis-specific function library
+    |--driver.R                 # calls `lib.R`; runs & generates all figures/tables
+|--data/
+    |--standard_somascan.adat   # source data
+    |--clinical_meta.csv        # source data
+    |--additional_binary.rda    # derivative of source data for speed (*.Rmd)
+    |--models/
+        |--glm_model.rds        # pre-fit model
+|--plots/
+    |--figure1_2018-11-09.pdf   # figs resulting from driver.R
+    |--figure2_2018-11-09.png
+|--tables/
+    |--result_table1.csv        # tables resulting from driver.R
+    |--result_table2.csv
+|--explore/
+    |--dead end analyses
+    |--go here
+|--docs/
+    |--analysis_report.Rmd      # final report in Rmarkdown
+                                # refer to `env.R` & `lib.R` in setup chunk
+    |--analysis_report.html     # rendered Rmarkdown in `html`
+    |--analysis_report.pdf      # rendered Rmarkdown in `pdf`
+```
+
+* Sources:
+  + [Jenny Bryan](https://www.tidyverse.org/articles/2017/12/workflow-vs-script/)
+  + [Malcom Barrett](https://malco.io/2018/11/05/why-should-i-use-the-here-package/)
+  + [Ariel Muldoon](https://aosmith.rbind.io/2018/10/29/an-example-directory-structure/)

@@ -7,123 +7,168 @@ output:
     toc_float:
       collapsed: false
       smooth_scroll: false
+editor_options: 
+  chunk_output_type: console
 ---
 
-```{r echo = FALSE}
+```{r setup, echo = FALSE}
 library(reprex)
 ```
 
-# Resources
-* [https://reprex.tidyverse.org/articles/reprex-dos-and-donts.html](reprex dos and donts)
-* [https://github.com/tidyverse/reprex](reprex github)
-* [rstd.io/reprex](info materials)
+>
+"Making a good reprex is difficult,
+you're asking others (me) to experience your pain.
+A good reprex is how you meet them halfway." - Jenny Bryan
+>
+
+# Intro: resources
+
+* [RStudio Webinars](https://resources.rstudio.com/webinars){target="_blank"}
+* [dos and donts of `reprex`](https://reprex.tidyverse.org/articles/reprex-dos-and-donts.html){target="_blank"}
+* [`reprex` on Github](https://github.com/tidyverse/reprex){target="_blank"}
+* [Jenny Bryan's Slide Deck](https://speakerdeck.com/jennybc/reprex-reproducible-examples-with-r){target="_blank"}
 * Current `reprex` v`r packageVersion('reprex')`
   
 
 # How to generate a `reprex`
-1. from clipboard -> `reprex::reprex()`
-2. use addin -> RRStudio
+
+1. Clipboard -> `reprex::reprex()`
+2. RStudio addin:
    i) launch GUI
    i) selection -> key binding (Crtl+Shift+R)
-3. use an inline expression
-4. use a separate file
-5. NOTE: reprex -> highlight -> copy -> paste -> rmarkdown
+3. An inline expression
+4. A separate file
+5. **note**: `Rmarkdown` possible for paste into e-mail:
+   * reprex -> highlight -> copy -> paste
 
+## Examples
+```{r examples, eval = FALSE}
+# clipboard
+x <- factor("a")
+y <- factor("b")
+c(x, y)      # what happened here?
+
+# inline
+reprex({
+  x <- factor("a")
+  y <- factor("b")
+  c(x, y)
+})
+
+# external file
+reprex(input = "my_reprex.R")
+```
 
 # How to make a good `reprex`
 The `reprex` philosophy:
 
-* code that runs                       -> it must be self contained
-* code that reader doesn't have to run -> keep it simple
-* code that reader could easily run    -> NEVER SCREEN SHOT!!!!
+|     Tennet     |          example           |
+|:--------------:|:-------------------------- |
+| code that actually runs             | **it must be self contained** |
+| code the reader doesn't have to run | **keep it simple** |
+| code the reader could easily run    | **NEVER SCREEN SHOT!** |
 
 
 
-## Example:
-```{r}
-x <- factor("a")
-y <- factor("b")
-c(x, y)
+## Code that runs
+```{r praise, eval = FALSE}
+# attempt 1
+template <- "${ESCLAMATION} - your code is ${adjective}"
+praise(template)
+
+# attempt 2
+library(praise)
+praise(template)
+
+# success!
+library(praise)
+template <- "${ESCLAMATION} - your code is ${adjective}"
+praise(template)
 ```
-
 
 
 ## Simplist possible example
 ```{r}
+# KISS -> a 'minimal' example
 read.csv(text = "a,b\n1,2\n3,4")  # inline creation of df
 ```
 
 
-
-
-
-
-## You can include plots as well!
-```{r, eval = FALSE}
-reprex({
-  library(magrittr)
-  library(ggplot2)
-  set.seed(101)
-  data.frame(x = 1:100,
-             y = 1:100 + rnorm(100, sd = 10)) %>% 
-    ggplot2::ggplot(ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_point() +
-    ggplot2::geom_smooth(method = "loess") +
-    NULL
-})
+## Code Easy to run
+```{r}
+# Do not copy/paste from the R console!
+# Difficult fiddly edits to reproduce.
+test <- "'Header\nLine 2'\nValue"
+cat(test)
+readr::read_csv(test)   # `reprex::reprex_clean()`
 ```
 
-
-```{r, eval = FALSE}
-# copy all code
+```{r clean, eval = FALSE}
 # removes `#` at lines
 reprex::reprex::clean()
 ```
 
 
+
+
+## You can include plots as well!
+Figure uploaded to `imgur.com`:
+```{r plots, eval = FALSE}
+gapminder %>% 
+  dplyr::filter(continent != "Oceania") %>% 
+  ggplot(aes(x = year, y = lifeExp, group = country, color = country)) +
+  geom_line(lwd = 1, show.legend = FALSE) +
+  facet_wrap(~ continent) +
+  scale_color_manual(values = country_colors) +
+  theme_bw() + theme(strip.text = element_text(size = rel(1.1))) +
+  NULL
+```
+
+
+
 # Output options
-```{r, eval = FALSE}
+```{r output, eval = FALSE}
+# standard
 reprex({
   x <- rnorm(100)
   y <- rnorm(100)
   stats::cor(x, y)
 })
-```
 
 
-## You can send output files to directory
-```{r, eval = FALSE}
+# You can send output files to directory
 reprex({
   x <- rnorm(100)
   y <- rnorm(100)
   stats::cor(x, y)
 }, outfile = "my_corr")
-```
 
 
-## Include session info
-```{r, eval = FALSE}
+# Include session info
 reprex({
   x <- rnorm(100)
   y <- rnorm(100)
   stats::cor(x, y)
-}, si = TRUE)    # session info
-```
+}, si = TRUE)
 
 
-## Re-style your code
-```{r, eval = FALSE}
+# Re-style your code
 reprex({
   x <- rnorm(100)
   y <- rnorm(100)
   stats::cor(x, y)
 }, style = TRUE)    # tidyverse style
-```
 
 
+# change output format for venue
+reprex({
+  x <- rnorm(100)
+  y <- rnorm(100)
+  stats::cor(x, y)
+}, venue = "so")   # options: gh <def>, so, ds, r, rtf
 
-## capture standard error out
-```{r eval = FALSE}
+
+# capture standard error out
 reprex({
   x <- rnorm(100)
   y <- rnorm(100)

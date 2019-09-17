@@ -3,7 +3,7 @@
 
 # the `base::nrow()` function
 # Depends on `base::dim()`
-nrow
+base::nrow
 
 # use
 nrow(mtcars)

@@ -6,7 +6,7 @@ library(magrittr)
 library(tibble)
 suppressMessages(library(dplyr))
 mtcars %<>% dplyr::mutate(id = dplyr::row_number())  %>% # set up identifier variable for the join
-  tibble::as.tibble()
+  tibble::as_tibble()
 mtcars
 
 set.seed(1)                               # reproducible

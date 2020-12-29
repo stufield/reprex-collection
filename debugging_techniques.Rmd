@@ -1,0 +1,53 @@
+---
+title: "Debugging Techniques in RStudio"
+author: Stu Field
+date: "`r format(Sys.Date(), '%A %B %d, %Y')`"
+output:
+  xaringan::moon_reader:
+    self_contained: true
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightLanguage: R
+      countIncrementalSlides: false
+---
+
+
+# Debugging techniques: Errors
+
+* Set editor break points
+  + red dot
+  + not in conditional statements
+  + doesn't change code
+
+--
+* Use the browser break point
+  + changes code need to resave
+
+--
+* Use `debugonce(...)`
+  + `debugonce(my_func)`
+
+--
+* Stop on error
+  + debug menu drop down; `On Error` -> `break in code`
+  + options(error = browser)
+  + enter debug mode upon error
+
+--
+* Use `Rerun with Debug` next to `Traceback` option
+
+--
+* In debug mode:
+  + `n -> next`
+  + `s -> step into function`
+  + `Q -> quit debugger`
+
+
+---
+# Debugging techniques: Shiny
+
+* Use `tracing` techniques
+* `options(shiny.error = browser)`
+* `runApp(appDir = "myApp", display.mode = "showcase")`
+* `cat(file = stderr(), ...)` rather than print() calls in shiny Apps

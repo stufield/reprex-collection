@@ -28,7 +28,7 @@ library(yardstick)
 ```
 
 
-------------------------
+--------
 
 
 # Setup
@@ -43,7 +43,7 @@ library(yardstick)
 
 
 
----------------
+--------
 
 
 # Simulate some easy data to predict classes
@@ -143,12 +143,12 @@ simres         # view the `tibble` of the simulation
 ```
 
 
---------------
+-----
 
 
 # Class imbalance vs. prediction accuracy
 
-* Simulation statrs at 51.5% class 1; Accuracy = 0.855
+* Simulation starts at 51.5% class 1; Accuracy = 0.855
 * Simulation ends at 98.8% class 1; Accuracy = 0.648
 
 ```{r plot_imbalance}
@@ -161,7 +161,7 @@ simres %>%
 ```
 
 
------------------
+-----
 
 
 Created by [Rmarkdown](https://github.com/rstudio/rmarkdown)

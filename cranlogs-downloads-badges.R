@@ -17,8 +17,6 @@ httr::GET(url = "https://cranlogs.r-pkg.org/downloads/total/last-month/SomaDataI
 httr::GET(url = "https://cranlogs.r-pkg.org/downloads/total/last-day/SomaDataIO") |>
   httr::content("parsed", encoding = "UTF-8") |> unlist()
 
-
-
 # badges
 httr::GET(url = "https://cranlogs.r-pkg.org/badges/grand-total/SomaDataIO")
 

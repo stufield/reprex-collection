@@ -1,7 +1,6 @@
 #' Cautionary tale with `which` and `NAs`
 #' -----------------------------------------
-#' Issue came up with Yolanda/Leigh with `which` and `NAs`
-#' getting incorrect indices
+#' `which` and `NAs` getting incorrect indices
 x <- c(rep("A", 4), rep(NA_character_, 4))
 x
 
